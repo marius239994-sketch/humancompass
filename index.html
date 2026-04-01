@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HumanCompass</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#080808;--bg2:#0e0e0c;--bg3:#141412;--txt:#ddd8cc;--txt2:#7a7568;--txt3:#282620;--acc:#bf7a24;--acc2:#d4902e;--risk:#b83020;--bord:#1c1a16}
+    ::selection{background:var(--acc);color:var(--bg)}
+    html,body{background:var(--bg);color:var(--txt);font-family:'DM Mono',monospace;min-height:100vh}
+    .hdr{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--bord);padding:15px 40px;display:flex;align-items:center;justify-content:space-between}
+    .logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:6px}
+    .logo-sub{font-size:9px;letter-spacing:3px;color:var(--txt3);margin-top:2px}
+    main{max-width:700px;margin:0 auto;padding:110px 40px 80px}
+    .hero-title{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;line-height:1;margin-bottom:12px}
+    .hero-sub{font-size:11px;letter-spacing:1px;color:var(--txt2);line-height:1.7;margin-bottom:44px}
+    .fg{margin-bottom:22px}
+    .fl{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;color:var(--acc);margin-bottom:7px}
+    textarea{width:100%;background:transparent;border:1px solid var(--bord);color:var(--txt);font-family:'DM Mono',monospace;font-size:13px;line-height:1.75;padding:12px 14px;resize:vertical;outline:none;transition:border-color 0.15s}
+    textarea:focus{border-color:var(--acc)}
+    textarea::placeholder{color:var(--txt3)}
+    .btn-run{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;background:var(--acc);color:var(--bg);border:none;padding:14px 48px;cursor:pointer;transition:background 0.12s;margin-top:14px}
+    .btn-run:hover{background:var(--acc2)}
+    .btn-ghost{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;background:transparent;color:var(--acc);border:1px solid var(--acc);padding:9px 22px;cursor:pointer;transition:all 0.12s}
+    .btn-ghost:hover{background:var(--acc);color:var(--bg)}
+    .btn-row{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+    .err{color:var(--risk);font-size:11px;letter-spacing:1px;margin-bottom:10px}
+    .loading{text-align:center;padding:80px 0}
+    .loading-lbl{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:5px;color:var(--txt3);margin-bottom:22px}
+    .dots{display:flex;justify-content:center;gap:8px}
+    .dot{width:6px;height:6px;background:var(--acc);border-radius:50%;animation:blink 1.4s infinite}
+    .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+    @keyframes blink{0%,80%,100%{opacity:.1}40%{opacity:1}}
+    .loading-steps{margin-top:28px;font-size:10px;color:var(--txt3);letter-spacing:1.5px;line-height:2.2}
+    .out-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px}
+    .out-meta{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;color:var(--txt3)}
+    .out-ts{font-size:9px;letter-spacing:2px;color:var(--bg3);margin-top:3px}
+    .ctx-bar{background:var(--bg2);border:1px solid var(--bord);padding:12px 16px;font-size:11px;color:var(--txt2);line-height:1.7;margin-bottom:32px}
+    .ob{padding-left:20px;border-left:2px solid var(--acc);margin-bottom:26px}
+    .ob.risk{border-left-color:var(--risk)}.ob.act{border-left-color:var(--txt)}
+    .ob-lbl{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:var(--acc);margin-bottom:7px}
+    .ob.risk .ob-lbl{color:var(--risk)}.ob.act .ob-lbl{color:var(--txt)}
+    .ob-txt{font-size:13px;line-height:1.85}
+    .ob.act .ob-txt{font-size:15px;font-weight:500}
+    .divl{height:1px;background:var(--bord);margin:40px 0 28px}
+    .fb-lbl{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:4px;color:var(--txt3);margin-bottom:20px}
+    .fbg{margin-bottom:14px}
+    .fbq{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:3px;color:var(--acc);margin-bottom:6px}
+    .fb-field{width:100%;background:transparent;border:1px solid var(--bord);color:var(--txt);font-family:'DM Mono',monospace;font-size:12px;padding:10px 12px;resize:none;outline:none;line-height:1.6}
+    .fb-field::placeholder{color:var(--txt3)}
+    .hist{margin-top:60px}
+    .hist-t{font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:4px;color:var(--bg3);margin-bottom:12px}
+    .hi{padding:9px 0;border-bottom:1px solid var(--bord);display:flex;gap:14px;font-size:11px;color:var(--txt3)}
+    .hi-t{min-width:34px;flex-shrink:0}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fade{animation:fadeUp .3s ease forwards}
+    @media(max-width:600px){.hdr{padding:14px 20px}main{padding:100px 20px 60px}.hero-title{font-size:38px}}
+  </style>
+</head>
+<body>
+  <header class="hdr">
+    <div><div class="logo">HUMANCOMPASS</div><div class="logo-sub">BESLUTNINGSMOTOR</div></div>
+    <div id="hdr-date" style="font-size:9px;letter-spacing:2px;color:#282620"></div>
+  </header>
+  <main id="app"></main>
+  <script>
+    document.getElementById('hdr-date').textContent=new Date().toLocaleDateString('no-NO',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const st={phase:'input',sit:'',maal:'',foel:'',output:null,hist:[],err:''};
+    function parse(txt){
+      const s={},K=['BESLUTNING','HVORFOR','RISIKO','NESTE STEG'];
+      for(let i=0;i<K.length;i++){
+        const k=K[i],n=K[i+1];
+        const re=n?new RegExp('\\*\\*'+k+':\\*\\*[\\s\\n]*([\\s\\S]+?)(?=\\*\\*'+n+':)'):new RegExp('\\*\\*'+k+':\\*\\*[\\s\\n]*([\\s\\S]+?)\\s*$');
+        const m=txt.match(re);if(m)s[k]=m[1].trim();
+      }
+      return Object.keys(s).length>=2?s:null;
+    }
+    async function run(){
+      if(!st.sit.trim()||!st.maal.trim()){st.err='Situasjon og maal er paakrevd.';render();return;}
+      st.err='';st.phase='loading';render();
+      const msg='SITUASJON: '+st.sit+'\n\nMAL: '+st.maal+'\n\nFOLELSE: '+(st.foel||'Ikke oppgitt');
+      try{
+        const r=await fetch('/api/agent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:msg}]})});
+        const d=await r.json();
+        const t=d.content?.[0]?.text||'';
+        st.output=parse(t)||{'BESLUTNING':t,'HVORFOR':'','RISIKO':'','NESTE STEG':''};
+        st.hist.unshift({time:new Date().toLocaleTimeString('no-NO',{hour:'2-digit',minute:'2-digit'}),snap:st.sit.slice(0,85)});
+        if(st.hist.length>10)st.hist.pop();
+        st.phase='output';
+      }catch(e){st.err='Tilkoblingsfeil. Sjekk API-konfigurasjon.';st.phase='input';}
+      render();
+    }
+    function reset(){st.phase='input';st.sit='';st.maal='';st.foel='';st.output=null;st.err='';render();}
+    function logFb(){st.phase='done';render();}
+    function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+    function ob(l,t,c=''){if(!t)return '';return '<div class="ob '+c+'"><div class="ob-lbl">'+l+'</div><div class="ob-txt">'+esc(t)+'</div></div>';}
+    function histHTML(){
+      if(st.hist.length<2)return '';
+      return '<div class="hist"><div class="divl"></div><div class="hist-t">HISTORIKK / SESJON</div>'+st.hist.slice(1).map(h=>'<div class="hi"><span class="hi-t">'+h.time+'</span><span>'+esc(h.snap)+(h.snap.length>=85?'&hellip;':'')+'</span></div>').join('')+'</div>';
+    }
+    function render(){
+      const app=document.getElementById('app');
+      const ts=new Date().toLocaleTimeString('no-NO',{hour:'2-digit',minute:'2-digit'});
+      if(st.phase==='input'){
+        app.innerHTML='<div class="fade"><div class="hero-title">PRESS.<br><span style="color:#bf7a24">DECIDE.</span><br>ACT.</div><p class="hero-sub">Ingen coaching. Ingen fluff.<br>En beslutning + en handling.</p><div class="fg"><div class="fl">01 / SITUASJON *</div><textarea id="f1" rows="4" placeholder="Hva er situasjonen? Konkret.">'+esc(st.sit)+'</textarea></div><div class="fg"><div class="fl">02 / MAL *</div><textarea id="f2" rows="2" placeholder="Hva vil du faktisk oppnaa?">'+esc(st.maal)+'</textarea></div><div class="fg"><div class="fl">03 / FOLELSE</div><textarea id="f3" rows="2" placeholder="Hva kjenner du paa? (valgfritt)">'+esc(st.foel)+'</textarea></div>'+(st.err?'<div class="err">'+esc(st.err)+'</div>':'')+'<button class="btn-run" onclick="run()">KJOR BESLUTNING</button>'+histHTML()+'</div>';
+        document.getElementById('f1').oninput=e=>st.sit=e.target.value;
+        document.getElementById('f2').oninput=e=>st.maal=e.target.value;
+        document.getElementById('f3').oninput=e=>st.foel=e.target.value;
+      }else if(st.phase==='loading'){
+        app.innerHTML='<div class="loading fade"><div class="loading-lbl">PRESSER...</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="loading-steps">Klargjor problem<br>Avdekker antakelser<br>Tvinger trade-offs<br>Simulerer konsekvens</div></div>';
+      }else if(st.phase==='output'){
+        const o=st.output;
+        app.innerHTML='<div class="fade"><div class="out-hdr"><div><div class="out-meta">ANALYSE KOMPLETT</div><div class="out-ts">'+ts+'</div></div><button class="btn-ghost" onclick="reset()">NY</button></div><div class="ctx-bar"><span style="color:var(--txt3)">SITUASJON: </span>'+esc(st.sit)+'</div>'+ob('BESLUTNING',o['BESLUTNING'])+ob('HVORFOR',o['HVORFOR'])+ob('RISIKO',o['RISIKO'],'risk')+ob('NESTE STEG',o['NESTE STEG'],'act')+'<div class="divl"></div><div class="fb-lbl">FEEDBACK LOOP</div><div class="fbg"><div class="fbq">HVA GJORDE DU FAKTISK?</div><textarea class="fb-field" id="fb1" rows="2" placeholder="Ikke hva du planla. Hva skjedde?"></textarea></div><div class="fbg"><div class="fbq">HVA BLE RESULTATET?</div><textarea class="fb-field" id="fb2" rows="2" placeholder="Fakta, ikke folelser."></textarea></div><div class="fbg"><div class="fbq">HVA VAR FEIL?</div><textarea class="fb-field" id="fb3" rows="2" placeholder="Hva traff ikke?"></textarea></div><div class="btn-row"><button class="btn-run" style="font-size:16px;padding:10px 28px;margin-top:0" onclick="logFb()">LOGG</button><button class="btn-ghost" onclick="reset()">HOPP OVER</button></div></div>';
+      }else{
+        const o=st.output;
+        app.innerHTML='<div class="fade"><div class="out-hdr"><div class="out-meta">LOGGET</div><button class="btn-ghost" onclick="reset()">NY</button></div>'+ob('BESLUTNING',o['BESLUTNING'])+ob('NESTE STEG',o['NESTE STEG'],'act')+'<div class="divl"></div><p style="font-family:Bebas Neue,sans-serif;font-size:11px;letter-spacing:4px;color:#bf7a24;margin-bottom:14px">LOGGET. SYSTEMET LAERER.</p><button class="btn-ghost" onclick="reset()">NY BESLUTNING</button></div>';
+      }
+    }
+    render();
+  </script>
+</body>
+</html>
